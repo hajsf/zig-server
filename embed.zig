@@ -11,7 +11,7 @@ const EmbeddedFile = struct {
 
 var embedded_files = std.ArrayList(EmbeddedFile).init(std.heap.page_allocator);
 
-fn processDirectory(path: []const u8) !void {
+pub fn processDirectory(path: []const u8) !void {
     var dir = try fs.cwd().openIterableDir(path, .{});
     defer dir.close();
     var it = dir.iterate();
