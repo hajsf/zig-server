@@ -1,27 +1,29 @@
 const std = @import("std");
 const allocator = std.heap.page_allocator;
 const routes = @import("routes.zig");
+const task = @import("taskKill.zig");
+const embed = @import("embed.zig");
 
 pub fn main() !void {
+    routes.debug = true;
+    try embed.processDirectory("www");
+    const port: u16 = 8181;
     const server_options: std.net.StreamServer.Options = .{};
     var server = std.net.StreamServer.init(server_options);
     defer server.deinit();
-    const addr = try std.net.Address.parseIp("0.0.0.0", 8080);
+    const addr = try std.net.Address.parseIp("0.0.0.0", port);
 
     // Start listening on the given address
     var listen_attempts: u8 = 0;
     while (true) {
         if (server.listen(addr)) |_| {
-            //  var addr_str: [64]u8 = undefined;
-            //  const addr_str_len = try std.fmt.bufPrint(addr_str[0..], "{}", .{addr});
-            //  const addr_str_slice = std.mem.sliceTo(addr_str[0..addr_str_len], u8);
-            //  std.debug.print("Server listening on http://{}:{}/\n", .{ addr_str_slice, addr.port });
-            std.log.info("Server listening on http://{s}:{s}/", .{ "localhost", "8080" });
+            std.log.info("Server listening on http://{s}:{}/", .{ "localhost", port });
             break;
         } else |err| {
             switch (err) {
                 error.AddressInUse => {
                     std.debug.print("Failed to listen on port because it is in use by another process, trying to kill it\n", .{});
+                    try task.killtask(port);
                     listen_attempts += 1;
                     if (listen_attempts >= 3) {
                         std.debug.print("Failed to listen on port after {} attempts: {}\n", .{ listen_attempts, err });
