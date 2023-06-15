@@ -17,7 +17,7 @@ pub fn killtask(port: u16) !void {
         // Clean the tailing white spaces
         pid = std.mem.trimRight(u8, result.stdout, &std.ascii.spaces);
     } else if (builtin.os.tag == .windows) {
-        const cmd = [_][]const u8{ "cmd", "/C", std.fmt.bufPrint(&buf, "netstat -aon | findstr :{s}", .{port}) catch unreachable };
+        const cmd = [_][]const u8{ "cmd", "/C", std.fmt.bufPrint(&buf, "netstat -aon | findstr :{}", .{port}) catch unreachable };
         const result = try std.ChildProcess.exec(.{
             .allocator = allocator,
             .argv = &cmd,
