@@ -3,7 +3,7 @@ const allocator = std.heap.page_allocator;
 const index = @import("index.zig");
 const login = @import("login.zig");
 const www = @import("www.zig");
-const wwwe = @import("wwwe.zig");
+const embed = @import("embed.zig");
 
 pub var debug: bool = undefined;
 
@@ -16,10 +16,11 @@ pub fn handleRoutes(conn: std.net.StreamServer.Connection, buffer: *[1024]u8, me
             try login.handleLogin(conn, buffer);
         } else {
             // Serve static files from the www folder
+            std.log.info("The debug is: {}", .{debug});
             if (debug == true) {
                 try www.handleStatic(conn, buffer, route);
             } else {
-                try wwwe.handleStatic(conn, buffer, route);
+                try embed.handleStatic(conn, buffer, route);
             }
         }
     } else if (std.mem.eql(u8, method, "POST")) {
