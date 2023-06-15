@@ -3,6 +3,9 @@ const allocator = std.heap.page_allocator;
 const index = @import("index.zig");
 const login = @import("login.zig");
 const www = @import("www.zig");
+const wwwe = @import("wwwe.zig");
+
+pub var debug: bool = undefined;
 
 pub fn handleRoutes(conn: std.net.StreamServer.Connection, buffer: *[1024]u8, method: []const u8, route: []const u8) !void {
     // Handle different routes and methods
@@ -13,7 +16,11 @@ pub fn handleRoutes(conn: std.net.StreamServer.Connection, buffer: *[1024]u8, me
             try login.handleLogin(conn, buffer);
         } else {
             // Serve static files from the www folder
-            try www.handleStatic(conn, buffer, route);
+            if (debug == true) {
+                try www.handleStatic(conn, buffer, route);
+            } else {
+                try wwwe.handleStatic(conn, buffer, route);
+            }
         }
     } else if (std.mem.eql(u8, method, "POST")) {
         // Serve a JSON error message for POST requests
