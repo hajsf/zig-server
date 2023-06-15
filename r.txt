@@ -1,0 +1,1 @@
+zig build -fstage1 -Dtarget=x86_64-windows -Drelease-fast -Dstrip
